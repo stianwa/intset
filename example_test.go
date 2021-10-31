@@ -15,14 +15,12 @@ func ExampleNew() {
 	fmt.Printf("a: %s\nb: %s\n", a, b)
 }
 
-
 func ExampleAll() {
 	fmt.Println(intset.New(intset.All()))
 
 	// Same as
 	fmt.Println(intset.New().Complement())
 }
-
 
 func ExampleNegInf() {
 	// Create an integer set ranging from -∞ to 15
@@ -32,7 +30,6 @@ func ExampleNegInf() {
 	fmt.Println(a.Complement())
 }
 
-
 func ExamplePosInf() {
 	// Create an integer set ranging from 15 to ∞
 	a := intset.New(intset.PosInf(15))
@@ -41,9 +38,7 @@ func ExamplePosInf() {
 	fmt.Println(a.Complement())
 }
 
-
-
-func Example_Cardinality() {
+func ExampleIntSet_Cardinality() {
 	a := intset.New(intset.Range(-100,100), intset.Range(260, 784), intset.Int(900))
 
 	if inf, c := a.Cardinality(); !inf {

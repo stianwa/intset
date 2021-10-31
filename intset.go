@@ -54,13 +54,13 @@ func (a *IntSet) AddInts(numbers ...int) {
 	}
 }
 
-// AddPosInf adds a range from n to positive infinity to a set.
+// AddPosInf adds a range from n to ∞ to the set.
 func (a *IntSet) AddPosInf(n int) {
 	a.insertElement(PosInf(n))
 
 }
 
-// AddNegInf adds a range from n to negative infinity to a set.
+// AddNegInf adds a range from -∞ to n to the set.
 func (a *IntSet) AddNegInf(n int) {
 	a.insertElement(NegInf(n))
 }
@@ -85,7 +85,6 @@ func (a *IntSet) RemoveElements(elements ...*Element) {
 		a.removeElement(r)
 	}
 }
-
 
 // insertRange inserts a single Range to a set.
 func (a *IntSet) insertElement(r *Element) {
@@ -188,8 +187,10 @@ func (a *IntSet) HasInt(m int) bool {
 	return false
 }
 
-// Cardinality returns a boolean (true when infinite), and an unsigned
-// int holding the cardinality of the set when finite.
+// Cardinality returns a boolean infinite flag and an unsigned integer
+// holding the cardinality of the set. If the infinite flag is true,
+// the cardinality of the set is infinite and the value of the
+// unsigned integer must be discarded.
 func (a *IntSet) Cardinality() (bool, uint) {
 	var cardinality uint
 	
@@ -225,7 +226,7 @@ func uintAddOverflow(p *uint, n uint) bool {
 	return false
 }
 
-// Complement returns the complement of the set.
+// Complement returns a∁.
 func (a *IntSet) Complement() *IntSet {
 	n := &IntSet{}
 
@@ -269,7 +270,7 @@ func (a *IntSet) Complement() *IntSet {
 	return n
 }
 
-// Union returns the union between two sets.
+// Union returns a ∪ b.
 func (a *IntSet) Union(b *IntSet) *IntSet {
 	new := &IntSet{}
 	
@@ -285,7 +286,7 @@ func (a *IntSet) Union(b *IntSet) *IntSet {
 	return new
 }
 
-// Intersect returns the intersection of two sets.
+// Intersect returns a ∩ b.
 func (a *IntSet) Intersect(b *IntSet) *IntSet {
 	new := &IntSet{}
 	for _, ar := range a.elements {
@@ -299,8 +300,7 @@ func (a *IntSet) Intersect(b *IntSet) *IntSet {
 	return new
 }
 
-// Difference returns the difference between the two sets, a - b.
-// Example ....
+// Difference returns a - b.
 func (a *IntSet) Difference(b *IntSet) *IntSet {
 	new := a.Copy()
 	new.RemoveElements(b.elements...)
@@ -310,8 +310,7 @@ func (a *IntSet) Difference(b *IntSet) *IntSet {
 }
 
 
-// Xor of a and b.
-// Example ....
+// Xor returns a ⊻ b.
 func (a *IntSet) Xor(b *IntSet) *IntSet {
 	return a.Union(b).Difference(a.Intersect(b))
 }
@@ -340,23 +339,12 @@ func (a *IntSet) Equal(b *IntSet) bool {
 	return true
 }
 
-
+// IsSubsetOf returns true if a ⊆ b.
 func (a *IntSet) IsSubsetOf(b *IntSet) bool {
 	return a.Union(b).Equal(b)
 }
 
-func (a *IntSet) IsSupersetOf(b *IntSet) bool {
-	
-	return true
-}
-
-
+// IsProperSubsetOf returns true if a ⊊ b.
 func (a *IntSet) IsProperSubsetOf(b *IntSet) bool {
-	
-	return true
-}
-
-func (a *IntSet) IsProperSupersetOf(b *IntSet) bool {
-	
-	return true
+	return  a.IsSubsetOf(b) && !a.Equal(b)
 }
