@@ -30,7 +30,7 @@ func main() {
 
        fmt.Printf("%s union %s = %s\n", a, b, a.Union(b))
        fmt.Printf("%s intersect %s = %s\n", a, b, a.Intersect(b))
-       fmt.Printf("complement of %s = %s\n, a, a.Complement())
+       fmt.Printf("complement of %s = %s\n", a, a.Complement())
 
        if inf, c := b.Cardinality(); !inf {
             fmt.Printf("cardinality of %s is: %d\n", b, c)
@@ -43,4 +43,4 @@ func main() {
 License
 -------
 
-GPLv3, see [LICENSE](LICENSE)
+GPLv3, see [LICENSE.md](LICENSE.md)

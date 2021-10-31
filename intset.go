@@ -3,8 +3,6 @@
 // minimum and maximum values of the integers are limited by the
 // underlying 32-bit or a 64-bit machine platform.
 //
-//
-//
 //  package main
 //  
 //  import (
@@ -19,7 +17,7 @@
 //
 //      fmt.Printf("%s union %s = %s\n", a, b, a.Union(b))
 //      fmt.Printf("%s intersect %s = %s\n", a, b, a.Intersect(b))
-//      fmt.Printf("complement of %s = %s\n, a, a.Complement())
+//      fmt.Printf("complement of %s = %s\n", a, a.Complement())
 //
 //      if inf, c := b.Cardinality(); !inf {
 //          fmt.Printf("cardinality of %s is: %d\n", b, c)
@@ -35,7 +33,7 @@ import (
 	"strings"
 )
 
-// IntSet holds a slice of ranges, which makes a set.
+// IntSet holds a slice of element which makes a set.
 type IntSet struct {
 	elements     []*Element
 }
@@ -190,8 +188,8 @@ func (a *IntSet) HasInt(m int) bool {
 	return false
 }
 
-// Cardinality returns the number of elements in the set or -1 if
-// value is infinite or overflows.
+// Cardinality returns a boolean (true when infinite), and an unsigned
+// int holding the cardinality of the set when finite.
 func (a *IntSet) Cardinality() (bool, uint) {
 	var cardinality uint
 	
@@ -200,14 +198,31 @@ func (a *IntSet) Cardinality() (bool, uint) {
 			return true, 0
 		}
 		if r.last > 0 && r.first < 0 {
-			cardinality = cardinality + uint(r.last)
-			cardinality = cardinality + uint(r.first * - 1)
+			if uintAddOverflow(&cardinality, uint(r.last)) ||
+				uintAddOverflow(&cardinality, uint(r.first * -1)) ||
+				uintAddOverflow(&cardinality, 1) {
+				return true, 0
+			}
 		} else {
-			cardinality = cardinality + uint(r.last - r.first + 1)
+			if uintAddOverflow(&cardinality, uint(r.last - r.first + 1)) {
+				return true, 0
+			}
 		}
 	}
 
 	return false, cardinality
+}
+
+
+// add uint, returns true if overflow
+func uintAddOverflow(p *uint, n uint) bool {
+	save := *p
+	*p = *p + n
+	if *p < save {
+		return true
+	}
+
+	return false
 }
 
 // Complement returns the complement of the set.
