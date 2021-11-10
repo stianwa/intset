@@ -1,3 +1,6 @@
+# intset
+[![Go Report Card](https://goreportcard.com/badge/github.com/stianwa/intset)](https://goreportcard.com/report/github.com/stianwa/intset)
+
 Package intset implements set theory methods for sets in the ℤ
 domain. The operations can handle sets in the range -∞:∞, but the
 minimum and maximum values of the integers are limited by the
