@@ -1,14 +1,14 @@
 package intset
 
 import (
-	"testing"
-	"strings"
 	"fmt"
+	"strings"
+	"testing"
 )
 
 func TestRangeJoinNegConnected(t *testing.T) {
-	a := Range(-20,-10)
-	b := Range(-10,0)
+	a := Range(-20, -10)
+	b := Range(-10, 0)
 	e := "-20:0"
 	if fmt.Sprintf("%s", a.join(b)) != e {
 		t.Fatalf("joining range: %q and %q gave %q, expected %q", a, b, a.join(b), e)
@@ -16,8 +16,8 @@ func TestRangeJoinNegConnected(t *testing.T) {
 }
 
 func TestRangeJoinPosConnected(t *testing.T) {
-	a := Range(10,20)
-	b := Range(20,30)
+	a := Range(10, 20)
+	b := Range(20, 30)
 	e := "10:30"
 	if fmt.Sprintf("%s", a.join(b)) != e {
 		t.Fatalf("joining range: %q and %q gave %q, expected %q", a, b, a.join(b), e)
@@ -25,8 +25,8 @@ func TestRangeJoinPosConnected(t *testing.T) {
 }
 
 func TestRangeJoinCrostConnected(t *testing.T) {
-	a := Range(-10,0)
-	b := Range(0,10)
+	a := Range(-10, 0)
+	b := Range(0, 10)
 	e := "-10:10"
 	if fmt.Sprintf("%s", a.join(b)) != e {
 		t.Fatalf("joining range: %q and %q gave %q, expected %q", a, b, a.join(b), e)
@@ -44,7 +44,7 @@ func TestRangeJoinNegInf(t *testing.T) {
 
 func TestRangeJoinPosInf(t *testing.T) {
 	a := PosInf(10)
-	b := Range(-1,9)
+	b := Range(-1, 9)
 	e := "-1:∞"
 	if fmt.Sprintf("%s", a.join(b)) != e {
 		t.Fatalf("joining range: %q and %q gave %q, expected %q", a, b, a.join(b), e)
@@ -83,7 +83,7 @@ func TestRangeRemoveNegInf(t *testing.T) {
 
 func TestRangeRemovePosInfN(t *testing.T) {
 	a := PosInf(5)
-	b := Range(10,30)
+	b := Range(10, 30)
 	r := a.remove(b)
 	var s []string
 	for _, re := range r {
@@ -96,10 +96,9 @@ func TestRangeRemovePosInfN(t *testing.T) {
 	}
 }
 
-
 func TestRangeRemoveNegInfN(t *testing.T) {
 	a := NegInf(10)
-	b := Range(5,25)
+	b := Range(5, 25)
 	r := a.remove(b)
 	var s []string
 	for _, re := range r {
@@ -114,8 +113,8 @@ func TestRangeRemoveNegInfN(t *testing.T) {
 
 // range_test.go:126: remove range: "-4:4" from "-5:5" gave "-5, -3:5", expected "-5, 5"
 func TestRangeRemoveOverlap1(t *testing.T) {
-	a := Range(-5,5)
-	b := Range(-4,4)
+	a := Range(-5, 5)
+	b := Range(-4, 4)
 	r := a.remove(b)
 	var s []string
 	for _, re := range r {
@@ -129,8 +128,8 @@ func TestRangeRemoveOverlap1(t *testing.T) {
 }
 
 func TestRangeRemoveOverlap2(t *testing.T) {
-	a := Range(-5,5)
-	b := Range(-5,5)
+	a := Range(-5, 5)
+	b := Range(-5, 5)
 	r := a.remove(b)
 	var s []string
 	for _, re := range r {
@@ -144,8 +143,8 @@ func TestRangeRemoveOverlap2(t *testing.T) {
 }
 
 func TestRangeRemoveOverlap3(t *testing.T) {
-	a := Range(-5,5)
-	b := Range(-2,8)
+	a := Range(-5, 5)
+	b := Range(-2, 8)
 	r := a.remove(b)
 	var s []string
 	for _, re := range r {
@@ -159,8 +158,8 @@ func TestRangeRemoveOverlap3(t *testing.T) {
 }
 
 func TestRangeRemoveOverlap4(t *testing.T) {
-	a := Range(-5,5)
-	b := Range(-10,0)
+	a := Range(-5, 5)
+	b := Range(-10, 0)
 	r := a.remove(b)
 	var s []string
 	for _, re := range r {
@@ -233,7 +232,6 @@ func TestRangeRemoveOverlap8(t *testing.T) {
 	}
 }
 
-
 //
 
 func TestIsSuper1(t *testing.T) {
@@ -247,7 +245,7 @@ func TestIsSuper1(t *testing.T) {
 
 func TestIsSuper2(t *testing.T) {
 	a := Range(-9, 9)
-	b := Range(-10,10)
+	b := Range(-10, 10)
 	expect := false
 	if a.isSuper(b) != expect {
 		t.Fatalf("test: %q isSuper of %q returned %v, expected %v", a, b, a.isSuper(b), expect)
@@ -265,7 +263,7 @@ func TestIsSuper3(t *testing.T) {
 
 func TestIsSuper4(t *testing.T) {
 	a := PosInf(-9)
-	b := Range(-8,22)
+	b := Range(-8, 22)
 	expect := true
 	if a.isSuper(b) != expect {
 		t.Fatalf("test: %q isSuper of %q returned %v, expected %v", a, b, a.isSuper(b), expect)
@@ -280,7 +278,6 @@ func TestIsSuper5(t *testing.T) {
 		t.Fatalf("test: %q isSuper of %q returned %v, expected %v", a, b, a.isSuper(b), e)
 	}
 }
-
 
 func TestIsAdjacent1a(t *testing.T) {
 	a := All()
@@ -302,7 +299,7 @@ func TestIsAdjacent1b(t *testing.T) {
 
 func TestIsAdjacent2a(t *testing.T) {
 	a := NegInf(4)
-	b := Range(5,10)
+	b := Range(5, 10)
 	e := true
 	if a.isAdjacent(b) != e {
 		t.Fatalf("test: %q isAdjacent of %q returned %v, expected %v", a, b, a.isAdjacent(b), e)
@@ -310,7 +307,7 @@ func TestIsAdjacent2a(t *testing.T) {
 }
 
 func TestIsAdjacent2b(t *testing.T) {
-	a := Range(5,10)
+	a := Range(5, 10)
 	b := NegInf(4)
 	e := true
 	if a.isAdjacent(b) != e {
@@ -320,7 +317,7 @@ func TestIsAdjacent2b(t *testing.T) {
 
 func TestIsAdjacent2a1(t *testing.T) {
 	a := NegInf(5)
-	b := Range(5,10)
+	b := Range(5, 10)
 	e := false
 	if a.isAdjacent(b) != e {
 		t.Fatalf("test: %q isAdjacent of %q returned %v, expected %v", a, b, a.isAdjacent(b), e)
@@ -329,7 +326,7 @@ func TestIsAdjacent2a1(t *testing.T) {
 
 func TestIsAdjacent3a(t *testing.T) {
 	a := PosInf(11)
-	b := Range(5,10)
+	b := Range(5, 10)
 	e := true
 	if a.isAdjacent(b) != e {
 		t.Fatalf("test: %q isAdjacent of %q returned %v, expected %v", a, b, a.isAdjacent(b), e)
@@ -337,7 +334,7 @@ func TestIsAdjacent3a(t *testing.T) {
 }
 
 func TestIsAdjacent3b(t *testing.T) {
-	a := Range(5,39)
+	a := Range(5, 39)
 	b := PosInf(40)
 	e := true
 	if a.isAdjacent(b) != e {
@@ -364,8 +361,8 @@ func TestIsAdjacent4b(t *testing.T) {
 }
 
 func TestIsAdjacent5a(t *testing.T) {
-	a := Range(-5,10)
-	b := Range(11,20)
+	a := Range(-5, 10)
+	b := Range(11, 20)
 	e := true
 	if a.isAdjacent(b) != e {
 		t.Fatalf("test: %q isAdjacent of %q returned %v, expected %v", a, b, a.isAdjacent(b), e)
@@ -373,8 +370,8 @@ func TestIsAdjacent5a(t *testing.T) {
 }
 
 func TestIsAdjacent5b(t *testing.T) {
-	a := Range(11,20)
-	b := Range(-5,10)
+	a := Range(11, 20)
+	b := Range(-5, 10)
 	e := true
 	if a.isAdjacent(b) != e {
 		t.Fatalf("test: %q isAdjacent of %q returned %v, expected %v", a, b, a.isAdjacent(b), e)
@@ -382,8 +379,8 @@ func TestIsAdjacent5b(t *testing.T) {
 }
 
 func TestIsAdjacent5a1(t *testing.T) {
-	a := Range(-50,10)
-	b := Range(10,20)
+	a := Range(-50, 10)
+	b := Range(10, 20)
 	e := false
 	if a.isAdjacent(b) != e {
 		t.Fatalf("test: %q isAdjacent of %q returned %v, expected %v", a, b, a.isAdjacent(b), e)
@@ -391,17 +388,16 @@ func TestIsAdjacent5a1(t *testing.T) {
 }
 
 func TestIsAdjacent5b1(t *testing.T) {
-	b := Range(-50,10)
-	a := Range(10,20)
+	b := Range(-50, 10)
+	a := Range(10, 20)
 	e := false
 	if a.isAdjacent(b) != e {
 		t.Fatalf("test: %q isAdjacent of %q returned %v, expected %v", a, b, a.isAdjacent(b), e)
 	}
 }
 
-
 func TestIsAdjacent6b1(t *testing.T) {
-	b := Range(59,499)
+	b := Range(59, 499)
 	a := PosInf(500)
 	e := true
 	if a.isAdjacent(b) != e {
@@ -409,10 +405,9 @@ func TestIsAdjacent6b1(t *testing.T) {
 	}
 }
 
-
 func TestIsOverlapping1a(t *testing.T) {
 	a := All()
-	b := Range(10,20)
+	b := Range(10, 20)
 	e := true
 	if a.isOverlapping(b) != e {
 		t.Fatalf("test: %q isOverlapping of %q returned %v, expected %v", a, b, a.isOverlapping(b), e)
@@ -420,7 +415,7 @@ func TestIsOverlapping1a(t *testing.T) {
 }
 
 func TestIsOverlapping1b(t *testing.T) {
-	a := Range(10,20)
+	a := Range(10, 20)
 	b := All()
 	e := true
 	if a.isOverlapping(b) != e {
@@ -429,7 +424,7 @@ func TestIsOverlapping1b(t *testing.T) {
 }
 
 func TestIsOverlapping2a(t *testing.T) {
-	a := Range(-10,-5)
+	a := Range(-10, -5)
 	b := NegInf(5)
 	e := true
 	if a.isOverlapping(b) != e {
@@ -439,7 +434,7 @@ func TestIsOverlapping2a(t *testing.T) {
 
 func TestIsOverlapping2b(t *testing.T) {
 	a := NegInf(5)
-	b := Range(-10,-5)
+	b := Range(-10, -5)
 	e := true
 	if a.isOverlapping(b) != e {
 		t.Fatalf("test: %q isOverlapping of %q returned %v, expected %v", a, b, a.isOverlapping(b), e)
@@ -447,7 +442,7 @@ func TestIsOverlapping2b(t *testing.T) {
 }
 
 func TestIsOverlapping3a(t *testing.T) {
-	a := Range(-10,5)
+	a := Range(-10, 5)
 	b := PosInf(5)
 	e := true
 	if a.isOverlapping(b) != e {
@@ -457,7 +452,7 @@ func TestIsOverlapping3a(t *testing.T) {
 
 func TestIsOverlapping3b(t *testing.T) {
 	a := PosInf(5)
-	b := Range(5,10)
+	b := Range(5, 10)
 	e := true
 	if a.isOverlapping(b) != e {
 		t.Fatalf("test: %q isOverlapping of %q returned %v, expected %v", a, b, a.isOverlapping(b), e)
@@ -465,8 +460,8 @@ func TestIsOverlapping3b(t *testing.T) {
 }
 
 func TestIsOverlapping4a(t *testing.T) {
-	a := Range(5,10)
-	b := Range(2,8)
+	a := Range(5, 10)
+	b := Range(2, 8)
 	e := true
 	if a.isOverlapping(b) != e {
 		t.Fatalf("test: %q isOverlapping of %q returned %v, expected %v", a, b, a.isOverlapping(b), e)
@@ -474,8 +469,8 @@ func TestIsOverlapping4a(t *testing.T) {
 }
 
 func TestIsOverlapping4b(t *testing.T) {
-	a := Range(2,8)
-	b := Range(5,10)
+	a := Range(2, 8)
+	b := Range(5, 10)
 	e := true
 	if a.isOverlapping(b) != e {
 		t.Fatalf("test: %q isOverlapping of %q returned %v, expected %v", a, b, a.isOverlapping(b), e)
@@ -483,8 +478,8 @@ func TestIsOverlapping4b(t *testing.T) {
 }
 
 func TestIsOverlapping5a(t *testing.T) {
-	a := Range(5,10)
-	b := Range(10,18)
+	a := Range(5, 10)
+	b := Range(10, 18)
 	e := true
 	if a.isOverlapping(b) != e {
 		t.Fatalf("test: %q isOverlapping of %q returned %v, expected %v", a, b, a.isOverlapping(b), e)
@@ -492,8 +487,8 @@ func TestIsOverlapping5a(t *testing.T) {
 }
 
 func TestIsOverlapping5b(t *testing.T) {
-	a := Range(10,18)
-	b := Range(5,10)
+	a := Range(10, 18)
+	b := Range(5, 10)
 	e := true
 	if a.isOverlapping(b) != e {
 		t.Fatalf("test: %q isOverlapping of %q returned %v, expected %v", a, b, a.isOverlapping(b), e)

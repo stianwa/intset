@@ -4,7 +4,7 @@
 // underlying 32-bit or a 64-bit machine platform.
 //
 //  package main
-//  
+//
 //  import (
 //          "github.com/stianwa/intset"
 //          "fmt"
@@ -35,7 +35,7 @@ import (
 
 // IntSet holds a slice of element which makes a set.
 type IntSet struct {
-	elements     []*Element
+	elements []*Element
 }
 
 // New returns a new set. Any Range sets passed to New, will be added
@@ -110,7 +110,7 @@ func (a *IntSet) insertElement(r *Element) {
 			// insert mode
 			if e.isOverlapping(r) || e.isAdjacent(r) {
 				a.elements[i] = e.join(r)
-				
+
 				inserted = true
 			} else if r.first < e.first {
 				new = append(new, r)
@@ -148,7 +148,7 @@ func (a *IntSet) removeElement(r *Element) {
 	var new []*Element
 	for _, e := range a.elements {
 		for _, n := range e.remove(r) {
-			new = append(new, n)		
+			new = append(new, n)
 		}
 	}
 	a.elements = new
@@ -160,7 +160,7 @@ func (a *IntSet) String() string {
 	if len(a.elements) == 0 {
 		return fmt.Sprintf("{%c}", 0x2205)
 	}
-	
+
 	var ents []string
 	for _, r := range a.elements {
 		ents = append(ents, fmt.Sprintf("%s", r))
@@ -183,7 +183,7 @@ func (a *IntSet) HasInt(m int) bool {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -193,19 +193,19 @@ func (a *IntSet) HasInt(m int) bool {
 // unsigned integer must be discarded.
 func (a *IntSet) Cardinality() (bool, uint) {
 	var cardinality uint
-	
+
 	for _, r := range a.elements {
 		if r.inf() {
 			return true, 0
 		}
 		if r.last > 0 && r.first < 0 {
 			if uintAddOverflow(&cardinality, uint(r.last)) ||
-				uintAddOverflow(&cardinality, uint(r.first * -1)) ||
+				uintAddOverflow(&cardinality, uint(r.first*-1)) ||
 				uintAddOverflow(&cardinality, 1) {
 				return true, 0
 			}
 		} else {
-			if uintAddOverflow(&cardinality, uint(r.last - r.first + 1)) {
+			if uintAddOverflow(&cardinality, uint(r.last-r.first+1)) {
 				return true, 0
 			}
 		}
@@ -213,7 +213,6 @@ func (a *IntSet) Cardinality() (bool, uint) {
 
 	return false, cardinality
 }
-
 
 // add uint, returns true if overflow
 func uintAddOverflow(p *uint, n uint) bool {
@@ -243,18 +242,18 @@ func (a *IntSet) Complement() *IntSet {
 			n.elements = append(n.elements, &Element{first: l.first - 1, neginf: true})
 		} else {
 			n.elements = append(n.elements, &Element{first: l.first - 1, neginf: true})
-			n.elements = append(n.elements, &Element{first: l.last  + 1, posinf: true})
+			n.elements = append(n.elements, &Element{first: l.last + 1, posinf: true})
 		}
 		return n
 	}
-	
-	last := len(a.elements) -2
+
+	last := len(a.elements) - 2
 	prev := a.elements[0]
 	for i, e := range a.elements[1:] {
 		if i == 0 {
 			if !prev.inf() {
 				n.elements = append(n.elements, &Element{first: prev.first - 1, neginf: true})
-				n.elements = append(n.elements, &Element{first: prev.last  + 1, last: e.first - 1})
+				n.elements = append(n.elements, &Element{first: prev.last + 1, last: e.first - 1})
 			} else {
 				n.elements = append(n.elements, &Element{first: prev.first + 1, last: e.first - 1})
 			}
@@ -266,14 +265,14 @@ func (a *IntSet) Complement() *IntSet {
 		}
 		prev = e
 	}
-	
+
 	return n
 }
 
 // Union returns a ∪ b.
 func (a *IntSet) Union(b *IntSet) *IntSet {
 	new := &IntSet{}
-	
+
 	for _, r := range a.elements {
 		new.insertElement(r)
 	}
@@ -282,7 +281,7 @@ func (a *IntSet) Union(b *IntSet) *IntSet {
 	}
 
 	new.optimize()
-	
+
 	return new
 }
 
@@ -305,16 +304,14 @@ func (a *IntSet) Difference(b *IntSet) *IntSet {
 	new := a.Copy()
 	new.RemoveElements(b.elements...)
 	new.optimize()
-	
+
 	return new
 }
-
 
 // Xor returns a ⊻ b.
 func (a *IntSet) Xor(b *IntSet) *IntSet {
 	return a.Union(b).Difference(a.Intersect(b))
 }
-
 
 // Copy returns a copy hf the set.
 func (a *IntSet) Copy() *IntSet {
@@ -331,7 +328,7 @@ func (a *IntSet) Equal(b *IntSet) bool {
 	}
 
 	for i, r := range a.elements {
-		if ! r.isEqual(b.elements[i]) {
+		if !r.isEqual(b.elements[i]) {
 			return false
 		}
 	}
@@ -346,5 +343,5 @@ func (a *IntSet) IsSubsetOf(b *IntSet) bool {
 
 // IsProperSubsetOf returns true if a ⊊ b.
 func (a *IntSet) IsProperSubsetOf(b *IntSet) bool {
-	return  a.IsSubsetOf(b) && !a.Equal(b)
+	return a.IsSubsetOf(b) && !a.Equal(b)
 }

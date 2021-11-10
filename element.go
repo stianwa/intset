@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// Element stores integers or ranges used in IntSet.
 type Element struct {
 	all    bool
 	neginf bool
@@ -62,243 +63,237 @@ func (e *Element) inf() bool {
 }
 
 // isAdjacent Returns true if the two element sets are adjacent.
-func (a *Element) isAdjacent(b *Element) bool {
-	return  a.all ||
-		b.all ||
+func (e *Element) isAdjacent(o *Element) bool {
+	return e.all ||
+		o.all ||
 
-		(a.neginf && !b.inf() && b.first == a.first + 1) ||
-		(b.neginf && !a.inf() && a.first == b.first + 1) ||
+		(e.neginf && !o.inf() && o.first == e.first+1) ||
+		(o.neginf && !e.inf() && e.first == o.first+1) ||
 
-		(a.posinf && !b.inf() && a.first - 1 == b.last) ||
-		(b.posinf && !a.inf() && b.first - 1 == a.last) ||
+		(e.posinf && !o.inf() && e.first-1 == o.last) ||
+		(o.posinf && !e.inf() && o.first-1 == e.last) ||
 
-		(a.posinf && b.neginf && b.first + 1 == a.first) ||
-		(b.posinf && a.neginf && a.first + 1 == b.first) ||
+		(e.posinf && o.neginf && o.first+1 == e.first) ||
+		(o.posinf && e.neginf && e.first+1 == o.first) ||
 
-		(!a.inf() && !b.inf() && b.first == a.last + 1) ||
-		(!b.inf() && !a.inf() && a.first == b.last + 1)
+		(!e.inf() && !o.inf() && o.first == e.last+1) ||
+		(!o.inf() && !e.inf() && e.first == o.last+1)
 }
 
 // isOverlapping Returns true if the two element sets are overlapping.
-func (a *Element) isOverlapping(b *Element) bool {
-	return  a.all  ||
-		b.all  ||
+func (e *Element) isOverlapping(o *Element) bool {
+	return e.all ||
+		o.all ||
 
-		(a.neginf && (b.neginf || b.first <= a.first)) ||
-		(b.neginf && (a.neginf || a.first <= b.first)) ||
+		(e.neginf && (o.neginf || o.first <= e.first)) ||
+		(o.neginf && (e.neginf || e.first <= o.first)) ||
 
-		(a.posinf && (b.posinf || b.first >= a.first)) ||
-		(b.posinf && (a.posinf || a.first >= b.first)) ||
+		(e.posinf && (o.posinf || o.first >= e.first)) ||
+		(o.posinf && (e.posinf || e.first >= o.first)) ||
 
-		(b.first <= a.first && b.last >= a.first) ||
-		(a.first <= b.first && a.last >= b.first) 
-}
-
-
-// isEqual Returns true if the two element sets are equal.
-func (a *Element) isEqual(b *Element) bool {
-	return (a.all && b.all) ||
-		(a.neginf && b.neginf && a.first == b.first) ||
-		(a.posinf && b.posinf && a.first == b.first) ||
-		(!a.inf() && !b.inf() && a.first == b.first && a.last == b.last)
+		(o.first <= e.first && o.last >= e.first) ||
+		(e.first <= o.first && e.last >= o.first)
 }
 
 // isEqual Returns true if the two element sets are equal.
-func (a *Element) isSuper(b *Element) bool {
-	return  (a.neginf && b.neginf && b.first < a.first) ||
-		(a.neginf && !b.inf() && b.last < a.first) ||
-		(a.posinf && b.posinf && b.first > a.first) ||
-		(a.posinf && !b.inf() && b.first > a.first) ||
-		(!a.inf() && !b.inf() && a.first < b.first && a.last > b.last)
+func (e *Element) isEqual(o *Element) bool {
+	return (e.all && o.all) ||
+		(e.neginf && o.neginf && e.first == o.first) ||
+		(e.posinf && o.posinf && e.first == o.first) ||
+		(!e.inf() && !o.inf() && e.first == o.first && e.last == o.last)
 }
 
-// isWithin Returns true if element a is within element b.
-func (a *Element) isWithin(b *Element) bool {
-	return a.first >= b.first && a.last <= b.last
+// isEqual Returns true if the two element sets are equal.
+func (e *Element) isSuper(o *Element) bool {
+	return (e.neginf && o.neginf && o.first < e.first) ||
+		(e.neginf && !o.inf() && o.last < e.first) ||
+		(e.posinf && o.posinf && o.first > e.first) ||
+		(e.posinf && !o.inf() && o.first > e.first) ||
+		(!e.inf() && !o.inf() && e.first < o.first && e.last > o.last)
+}
+
+// isWithin Returns true if element a is within element o.
+func (e *Element) isWithin(o *Element) bool {
+	return e.first >= o.first && e.last <= o.last
 }
 
 // join returns a joined element set when joining two overlapping
-// elements a and b. Note! The function does not check for overlap,
+// elements e and o. Note! The function does not check for overlap,
 // this must be done prior to calling this function.
-func (a *Element) join(b *Element) *Element {
-	neg, e := minInt(a,b)
-	pos, f := maxInt(a,b)
+func (e *Element) join(o *Element) *Element {
+	neg, min := minInt(e, o)
+	pos, max := maxInt(e, o)
 
 	if neg < 0 && pos < 0 {
 		return All()
 	} else if neg < 0 {
-		return NegInf(f)
+		return NegInf(max)
 	} else if pos < 0 {
-		return PosInf(e)
+		return PosInf(min)
 	} else {
-		return Range(e,f)
+		return Range(min, max)
 	}
 }
 
-// remove returns a list of element sets for removine set b from a.
-func (a *Element) remove(b *Element) []*Element {
+// remove returns a list of element sets for removine set b from e.
+func (e *Element) remove(o *Element) []*Element {
 	var ret []*Element
 
-	if a.isEqual(b) || b.all {
+	if e.isEqual(o) || o.all {
 		return ret
-	} else if  b.isSuper(a) || ! a.isOverlapping(b) {
-		ret = append(ret, a)
+	} else if o.isSuper(e) || !e.isOverlapping(o) {
+		ret = append(ret, e)
 		return ret
 	}
-	
-	if a.inf() || b.inf() {
-		if a.all && b.neginf {
-			ret = append(ret, &Element{first: b.first + 1, posinf: true})
-		} else if a.all && b.posinf {
-			ret = append(ret, &Element{first: b.first - 1, neginf: true})
-		} else if a.posinf && b.posinf {
-			ret = append(ret, &Element{first: a.first, last: b.first - 1})
-		} else if a.posinf && b.neginf {
-			ret = append(ret, &Element{first: b.first + 1, posinf: true})
-		} else if a.neginf && b.neginf {
-			ret = append(ret, &Element{first: b.first + 1, last: a.first})
-		} else if a.neginf && b.posinf {
-			ret = append(ret, &Element{first: b.first - 1, neginf: true})
-		} else if a.posinf && !b.inf() {
-			ret = append(ret, &Element{first: b.last + 1, posinf: true})
-		} else if a.neginf && !b.inf() {
-			ret = append(ret, &Element{first: b.first - 1, neginf: true})
-		} else if !a.inf() && b.posinf {
-			ret = append(ret, &Element{first: a.first, last: b.first - 1})
-		} else if !a.inf() && b.neginf {
-			ret = append(ret, &Element{first: b.first + 1, last: a.last})
-		} else if a.all && !b.inf() {
-			ret = append(ret, &Element{first: b.first - 1, neginf: true})
-			ret = append(ret, &Element{first: b.last  + 1, posinf: true})
+
+	if e.inf() || o.inf() {
+		if e.all && o.neginf {
+			ret = append(ret, &Element{first: o.first + 1, posinf: true})
+		} else if e.all && o.posinf {
+			ret = append(ret, &Element{first: o.first - 1, neginf: true})
+		} else if e.posinf && o.posinf {
+			ret = append(ret, &Element{first: e.first, last: o.first - 1})
+		} else if e.posinf && o.neginf {
+			ret = append(ret, &Element{first: o.first + 1, posinf: true})
+		} else if e.neginf && o.neginf {
+			ret = append(ret, &Element{first: o.first + 1, last: e.first})
+		} else if e.neginf && o.posinf {
+			ret = append(ret, &Element{first: o.first - 1, neginf: true})
+		} else if e.posinf && !o.inf() {
+			ret = append(ret, &Element{first: o.last + 1, posinf: true})
+		} else if e.neginf && !o.inf() {
+			ret = append(ret, &Element{first: o.first - 1, neginf: true})
+		} else if !e.inf() && o.posinf {
+			ret = append(ret, &Element{first: e.first, last: o.first - 1})
+		} else if !e.inf() && o.neginf {
+			ret = append(ret, &Element{first: o.first + 1, last: e.last})
+		} else if e.all && !o.inf() {
+			ret = append(ret, &Element{first: o.first - 1, neginf: true})
+			ret = append(ret, &Element{first: o.last + 1, posinf: true})
 		} else {
-			fmt.Printf("Here 200 a:%q -b:%q\n", a, b)
+			fmt.Printf("Here 200 a:%q -b:%q\n", e, o)
 		}
-	} else if b.isWithin(a) {
-		ret = append(ret, &Element{first: a.first, last: b.first - 1})
-		ret = append(ret, &Element{first: b.last + 1, last: a.last})
+	} else if o.isWithin(e) {
+		ret = append(ret, &Element{first: e.first, last: o.first - 1})
+		ret = append(ret, &Element{first: o.last + 1, last: e.last})
 	} else {
-		if a.first >= b.first {
-			ret = append(ret, &Element{first: b.last + 1, last: a.last})
+		if e.first >= o.first {
+			ret = append(ret, &Element{first: o.last + 1, last: e.last})
 		} else {
-			ret = append(ret, &Element{first: a.first, last: b.first - 1})
+			ret = append(ret, &Element{first: e.first, last: o.first - 1})
 		}
 	}
-	
+
 	return ret
 }
-
 
 // intersect returns a list of element sets from intersecting two
 // element sets.
-func (a *Element) intersect(b *Element) []*Element {
+func (e *Element) intersect(o *Element) []*Element {
 	var ret []*Element
 
-	if a.isEqual(b) || b.all {
-		ret = append(ret, a)
+	if e.isEqual(o) || o.all {
+		ret = append(ret, e)
 		return ret
-	} else if a.isSuper(b) {
-		ret = append(ret, b)
+	} else if e.isSuper(o) {
+		ret = append(ret, o)
 		return ret
-	} else if b.isSuper(a) {
-		ret = append(ret, a)
+	} else if o.isSuper(e) {
+		ret = append(ret, e)
 		return ret
-	} else if ! a.isOverlapping(b) {
+	} else if !e.isOverlapping(o) {
 		return ret
 	}
-	
-	if a.inf() || b.inf() {
-		if a.all && b.neginf {
-			ret = append(ret, b)
-		} else if a.all && b.posinf {
-			ret = append(ret, b)
-		}  else if a.posinf && b.posinf {
-			ret = append(ret, &Element{first: largestOf(a.first,b.first), posinf: true})
-		}  else if a.posinf && b.neginf {
-			ret = append(ret, &Element{first: a.first, last: b.first})
-		}  else if a.neginf && b.neginf {
-			ret = append(ret, &Element{first: smallestOf(a.first,b.first), neginf: true})
-		}  else if a.neginf && b.posinf {
-			ret = append(ret, &Element{first: b.first, last: a.last})
-		}  else if a.posinf && !b.inf() {
-			ret = append(ret, &Element{first: largestOf(a.first, b.first), last: b.last})
-		}  else if a.neginf && !b.inf() {
-			ret = append(ret, &Element{first: b.first, last: smallestOf(a.first, b.last)})
-		}  else if !a.inf() && b.posinf {
-			ret = append(ret, &Element{first: largestOf(a.first, b.first), last: a.last})
-		}  else if !a.inf() && b.neginf {
-			ret = append(ret, &Element{first: a.first, last: smallestOf(a.last, b.first)})
+
+	if e.inf() || o.inf() {
+		if e.all && o.neginf {
+			ret = append(ret, o)
+		} else if e.all && o.posinf {
+			ret = append(ret, o)
+		} else if e.posinf && o.posinf {
+			ret = append(ret, &Element{first: largestOf(e.first, o.first), posinf: true})
+		} else if e.posinf && o.neginf {
+			ret = append(ret, &Element{first: e.first, last: o.first})
+		} else if e.neginf && o.neginf {
+			ret = append(ret, &Element{first: smallestOf(e.first, o.first), neginf: true})
+		} else if e.neginf && o.posinf {
+			ret = append(ret, &Element{first: o.first, last: e.last})
+		} else if e.posinf && !o.inf() {
+			ret = append(ret, &Element{first: largestOf(e.first, o.first), last: o.last})
+		} else if e.neginf && !o.inf() {
+			ret = append(ret, &Element{first: o.first, last: smallestOf(e.first, o.last)})
+		} else if !e.inf() && o.posinf {
+			ret = append(ret, &Element{first: largestOf(e.first, o.first), last: e.last})
+		} else if !e.inf() && o.neginf {
+			ret = append(ret, &Element{first: e.first, last: smallestOf(e.last, o.first)})
 		}
 	} else {
-		ret = append(ret, &Element{first: largestOf(a.first, b.first), last: smallestOf(a.last, b.last)})
+		ret = append(ret, &Element{first: largestOf(e.first, o.first), last: smallestOf(e.last, o.last)})
 	}
-	
+
 	return ret
 }
-
-
 
 // Returns the minimum range value of two ranges. Returns two
 // integers: 0 or neginf if negative infinitive and the minInt value of a
 // and b unless negative infinitive.
-func minInt(a, b *Element) (int, int) {
-	if a.all || b.all || a.neginf || b.neginf || a.posinf || b.posinf {
-		if a.neginf || b.neginf || a.all || b.all {
+func minInt(e, o *Element) (int, int) {
+	if e.all || o.all || e.neginf || o.neginf || e.posinf || o.posinf {
+		if e.neginf || o.neginf || e.all || o.all {
 			return -1, 0
-		} else if a.posinf && b.posinf {
-			if a.first < b.first {
-				return 0, a.first
-			} else {
-				return 0, b.first
+		} else if e.posinf && o.posinf {
+			if e.first < o.first {
+				return 0, e.first
 			}
-		} else if a.posinf {
-			return 0, b.first
+			return 0, o.first
+		} else if e.posinf {
+			return 0, o.first
 		} else {
-			return 0, a.first
+			return 0, e.first
 		}
 	}
 
-	if a.first < b.first  {
-		return 0, a.first
+	if e.first < o.first {
+		return 0, e.first
 	}
-	return 0, b.first
+	return 0, o.first
 }
 
 // Returns the upper limit of two ranges. The function returns two
 // integers. The first is set to posinf if the maximum point is
 // positive infinite. The second is set to the maxumum point unless the
 // first is set to posinf.
-func maxInt(a, b *Element) (int, int) {
-	if a.all || b.all || a.neginf || b.neginf || a.posinf || b.posinf {
-		if a.posinf || b.posinf || a.all || b.all {
+func maxInt(e, o *Element) (int, int) {
+	if e.all || o.all || e.neginf || o.neginf || e.posinf || o.posinf {
+		if e.posinf || o.posinf || e.all || o.all {
 			return -1, 0
-		} else if a.neginf && b.neginf {
-			if a.first > b.first {
-				return 0, a.first
-			} else {
-				return 0, b.first
+		} else if e.neginf && o.neginf {
+			if e.first > o.first {
+				return 0, e.first
 			}
-		} else if a.neginf {
-			return 0, b.last
+			return 0, o.first
+		} else if e.neginf {
+			return 0, o.last
 		} else {
-			return 0, a.last
+			return 0, e.last
 		}
 	}
-	
-	if a.last > b.last {
-		return 0, a.last
+
+	if e.last > o.last {
+		return 0, e.last
 	}
 
-	return 0, b.last
+	return 0, o.last
 }
 
-func smallestOf(a, b int) (int) {
+func smallestOf(a, b int) int {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func largestOf(a, b int) (int) {
+func largestOf(a, b int) int {
 	if a > b {
 		return a
 	}

@@ -7,8 +7,8 @@ import (
 
 func ExampleNew() {
 	// Create a populated set
-	a := intset.New(intset.NegInf(-100), intset.Range(-10,10), intset.PosInf(100))
-	
+	a := intset.New(intset.NegInf(-100), intset.Range(-10, 10), intset.PosInf(100))
+
 	// Create an empty set
 	b := intset.New()
 
@@ -39,7 +39,7 @@ func ExamplePosInf() {
 }
 
 func ExampleIntSet_Cardinality() {
-	a := intset.New(intset.Range(-100,100), intset.Range(260, 784), intset.Int(900))
+	a := intset.New(intset.Range(-100, 100), intset.Range(260, 784), intset.Int(900))
 
 	if inf, c := a.Cardinality(); !inf {
 		fmt.Printf("cardinality of %s is %d\n", a, c)
