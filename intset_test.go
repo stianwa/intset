@@ -145,7 +145,7 @@ func TestCardinality1a(t *testing.T) {
 	maxint := int(maxuint >> 1)
 	minint := -maxint - 1
 	a := New(Range(minint, maxint))
-	inf, c := a.Cardinality()
+	c, inf := a.Cardinality()
 	if !inf {
 		t.Fatalf("cardinality failed: %s, got %d, expected %c", a, c, 0x221e)
 	}
@@ -157,7 +157,7 @@ func TestCardinality1b(t *testing.T) {
 	minint := -maxint
 	a := New(Range(minint, maxint))
 	var e uint = ^uint(0)
-	inf, c := a.Cardinality()
+	c, inf := a.Cardinality()
 	if inf {
 		t.Fatalf("cardinality failed: %s, got %c, expected %d", a, 0x221e, e)
 	} else if c != e {
@@ -168,7 +168,7 @@ func TestCardinality1b(t *testing.T) {
 func TestCardinality2(t *testing.T) {
 	a := New(Range(-1, 1))
 	var e uint = 3
-	inf, c := a.Cardinality()
+	c, inf := a.Cardinality()
 	if inf {
 		t.Fatalf("cardinality failed: %s, got %c, expected %d", a, 0x221e, e)
 	} else if c != e {
@@ -179,7 +179,7 @@ func TestCardinality2(t *testing.T) {
 func TestCardinality3(t *testing.T) {
 	a := New(Range(1, 5))
 	var e uint = 5
-	inf, c := a.Cardinality()
+	c, inf := a.Cardinality()
 	if inf {
 		t.Fatalf("cardinality failed: %s, got %c, expected %d", a, 0x221e, e)
 	} else if c != e {
@@ -190,7 +190,7 @@ func TestCardinality3(t *testing.T) {
 func TestCardinality4(t *testing.T) {
 	a := New(Range(-5, -1))
 	var e uint = 5
-	inf, c := a.Cardinality()
+	c, inf := a.Cardinality()
 	if inf {
 		t.Fatalf("cardinality failed: %s, got %c, expected %d", a, 0x221e, e)
 	} else if c != e {

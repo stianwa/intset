@@ -19,7 +19,7 @@
 //      fmt.Printf("%s intersect %s = %s\n", a, b, a.Intersect(b))
 //      fmt.Printf("complement of %s = %s\n", a, a.Complement())
 //
-//      if inf, c := b.Cardinality(); !inf {
+//      if c, inf := b.Cardinality(); !inf {
 //          fmt.Printf("cardinality of %s is: %d\n", b, c)
 //      } else {
 //          fmt.Println("cardinality of %s is infinite")
@@ -187,31 +187,31 @@ func (a *IntSet) HasInt(m int) bool {
 	return false
 }
 
-// Cardinality returns a boolean infinite flag and an unsigned integer
-// holding the cardinality of the set. If the infinite flag is true,
-// the cardinality of the set is infinite and the value of the
-// unsigned integer must be discarded.
-func (a *IntSet) Cardinality() (bool, uint) {
+// Cardinality returns an unsigned integer holding the cardinality and
+// an infinite boolean. If the infinite boolean is true, the
+// cardinality of the set can not be held by the unsigned integer, and
+// the value must be discarded.
+func (a *IntSet) Cardinality() (uint, bool) {
 	var cardinality uint
 
 	for _, r := range a.elements {
 		if r.inf() {
-			return true, 0
+			return 0, true
 		}
 		if r.last > 0 && r.first < 0 {
 			if uintAddOverflow(&cardinality, uint(r.last)) ||
 				uintAddOverflow(&cardinality, uint(r.first*-1)) ||
 				uintAddOverflow(&cardinality, 1) {
-				return true, 0
+				return 0, true
 			}
 		} else {
 			if uintAddOverflow(&cardinality, uint(r.last-r.first+1)) {
-				return true, 0
+				return 0, true
 			}
 		}
 	}
 
-	return false, cardinality
+	return cardinality, false
 }
 
 // add uint, returns true if overflow

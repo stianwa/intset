@@ -35,7 +35,7 @@ func main() {
        fmt.Printf("%s intersect %s = %s\n", a, b, a.Intersect(b))
        fmt.Printf("complement of %s = %s\n", a, a.Complement())
 
-       if inf, c := b.Cardinality(); !inf {
+       if c, inf := b.Cardinality(); !inf {
             fmt.Printf("cardinality of %s is: %d\n", b, c)
        } else {
             fmt.Println("cardinality of %s is infinite")

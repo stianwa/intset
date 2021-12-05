@@ -41,7 +41,7 @@ func ExamplePosInf() {
 func ExampleIntSet_Cardinality() {
 	a := intset.New(intset.Range(-100, 100), intset.Range(260, 784), intset.Int(900))
 
-	if inf, c := a.Cardinality(); !inf {
+	if c, inf := a.Cardinality(); !inf {
 		fmt.Printf("cardinality of %s is %d\n", a, c)
 	} else {
 		fmt.Printf("cardinality of %s is infinite\n", a)
