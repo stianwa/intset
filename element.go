@@ -24,9 +24,8 @@ func (e *Element) String() string {
 		return fmt.Sprintf("%d:%c", e.first, 0x221e)
 	} else if e.first == e.last {
 		return fmt.Sprintf("%d", e.first)
-	} else {
-		return fmt.Sprintf("%d:%d", e.first, e.last)
 	}
+	return fmt.Sprintf("%d:%d", e.first, e.last)
 }
 
 // Range returns an integer range from a to b.
@@ -130,9 +129,8 @@ func (e *Element) join(o *Element) *Element {
 		return NegInf(max)
 	} else if pos < 0 {
 		return PosInf(min)
-	} else {
-		return Range(min, max)
 	}
+	return Range(min, max)
 }
 
 // remove returns a list of element sets for removine set b from e.
@@ -248,9 +246,8 @@ func minInt(e, o *Element) (int, int) {
 			return 0, o.first
 		} else if e.posinf {
 			return 0, o.first
-		} else {
-			return 0, e.first
 		}
+		return 0, e.first
 	}
 
 	if e.first < o.first {
@@ -274,9 +271,8 @@ func maxInt(e, o *Element) (int, int) {
 			return 0, o.first
 		} else if e.neginf {
 			return 0, o.last
-		} else {
-			return 0, e.last
 		}
+		return 0, e.last
 	}
 
 	if e.last > o.last {

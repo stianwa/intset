@@ -3,29 +3,28 @@
 // minimum and maximum values of the integers are limited by the
 // underlying 32-bit or a 64-bit machine platform.
 //
-//  package main
+//	package main
 //
-//  import (
-//          "github.com/stianwa/intset"
-//          "fmt"
-//  )
+//	import (
+//	        "github.com/stianwa/intset"
+//	        "fmt"
+//	)
 //
-//  func main() {
-//      a := intset.New(intset.Range(-300, -30), intset.NegInf(-500), intset.PosInf(500))
+//	func main() {
+//	    a := intset.New(intset.Range(-300, -30), intset.NegInf(-500), intset.PosInf(500))
 //
-//      b := intset.New(intset.Range(-47, 23))
+//	    b := intset.New(intset.Range(-47, 23))
 //
-//      fmt.Printf("%s union %s = %s\n", a, b, a.Union(b))
-//      fmt.Printf("%s intersect %s = %s\n", a, b, a.Intersect(b))
-//      fmt.Printf("complement of %s = %s\n", a, a.Complement())
+//	    fmt.Printf("%s union %s = %s\n", a, b, a.Union(b))
+//	    fmt.Printf("%s intersect %s = %s\n", a, b, a.Intersect(b))
+//	    fmt.Printf("complement of %s = %s\n", a, a.Complement())
 //
-//      if c, inf := b.Cardinality(); !inf {
-//          fmt.Printf("cardinality of %s is: %d\n", b, c)
-//      } else {
-//          fmt.Println("cardinality of %s is infinite")
-//      }
-//  }
-//
+//	    if c, inf := b.Cardinality(); !inf {
+//	        fmt.Printf("cardinality of %s is: %d\n", b, c)
+//	    } else {
+//	        fmt.Println("cardinality of %s is infinite")
+//	    }
+//	}
 package intset
 
 import (
@@ -41,10 +40,10 @@ type IntSet struct {
 // New returns a new set. Any Range sets passed to New, will be added
 // to the set.
 func New(elements ...*Element) *IntSet {
-	new := &IntSet{}
-	new.AddElements(elements...)
+	n := &IntSet{}
+	n.AddElements(elements...)
 
-	return new
+	return n
 }
 
 // AddInts adds integers to a set.
@@ -95,7 +94,7 @@ func (a *IntSet) insertElement(r *Element) {
 		return
 	}
 
-	var new []*Element
+	var newList []*Element
 	var prev *Element
 
 	inserted := false
@@ -113,18 +112,18 @@ func (a *IntSet) insertElement(r *Element) {
 
 				inserted = true
 			} else if r.first < e.first {
-				new = append(new, r)
+				newList = append(newList, r)
 				inserted = true
 			}
 		}
 		prev = a.elements[i]
-		new = append(new, a.elements[i])
+		newList = append(newList, a.elements[i])
 	}
 	if !inserted {
-		new = append(new, r)
+		newList = append(newList, r)
 	}
 
-	a.elements = new
+	a.elements = newList
 }
 
 // optimize range sets
@@ -145,13 +144,13 @@ func (a *IntSet) optimize() {
 
 // removeElement removes a single element from a set.
 func (a *IntSet) removeElement(r *Element) {
-	var new []*Element
+	var newList []*Element
 	for _, e := range a.elements {
 		for _, n := range e.remove(r) {
-			new = append(new, n)
+			newList = append(newList, n)
 		}
 	}
-	a.elements = new
+	a.elements = newList
 }
 
 // String returns the set in a human readable form, in compliance with
@@ -271,41 +270,41 @@ func (a *IntSet) Complement() *IntSet {
 
 // Union returns a ∪ b.
 func (a *IntSet) Union(b *IntSet) *IntSet {
-	new := &IntSet{}
+	n := &IntSet{}
 
 	for _, r := range a.elements {
-		new.insertElement(r)
+		n.insertElement(r)
 	}
 	for _, r := range b.elements {
-		new.insertElement(r)
+		n.insertElement(r)
 	}
 
-	new.optimize()
+	n.optimize()
 
-	return new
+	return n
 }
 
 // Intersect returns a ∩ b.
 func (a *IntSet) Intersect(b *IntSet) *IntSet {
-	new := &IntSet{}
+	n := &IntSet{}
 	for _, ar := range a.elements {
 		for _, br := range b.elements {
-			for _, n := range ar.intersect(br) {
-				new.AddElements(n)
+			for _, e := range ar.intersect(br) {
+				n.AddElements(e)
 			}
 		}
 	}
-	new.optimize()
-	return new
+	n.optimize()
+	return n
 }
 
 // Difference returns a - b.
 func (a *IntSet) Difference(b *IntSet) *IntSet {
-	new := a.Copy()
-	new.RemoveElements(b.elements...)
-	new.optimize()
+	n := a.Copy()
+	n.RemoveElements(b.elements...)
+	n.optimize()
 
-	return new
+	return n
 }
 
 // Xor returns a ⊻ b.
@@ -315,10 +314,10 @@ func (a *IntSet) Xor(b *IntSet) *IntSet {
 
 // Copy returns a copy hf the set.
 func (a *IntSet) Copy() *IntSet {
-	new := &IntSet{}
-	new.AddElements(a.elements...)
+	n := &IntSet{}
+	n.AddElements(a.elements...)
 
-	return new
+	return n
 }
 
 // Equal returns true if the two sets are equal.

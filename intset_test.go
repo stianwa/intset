@@ -156,7 +156,7 @@ func TestCardinality1b(t *testing.T) {
 	maxint := int(maxuint >> 1)
 	minint := -maxint
 	a := New(Range(minint, maxint))
-	var e uint = ^uint(0)
+	var e = ^uint(0)
 	c, inf := a.Cardinality()
 	if inf {
 		t.Fatalf("cardinality failed: %s, got %c, expected %d", a, 0x221e, e)
